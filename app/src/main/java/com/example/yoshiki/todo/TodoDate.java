@@ -13,6 +13,12 @@ import android.widget.DatePicker;
  * @author 清兼
  */
 public class TodoDate extends Activity {
+
+    /**
+     * TodoDateActivityコールタイミングの状態定義
+     */
+    public static final int N_ACTIVITY_DATE    = 1;    // Todo実施期限設定
+
     /**
      * キー値定義
      */

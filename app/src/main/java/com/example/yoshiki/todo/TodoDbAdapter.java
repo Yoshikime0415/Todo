@@ -35,7 +35,7 @@ public class    TodoDbAdapter {
     public static final String STR_KEY_TITLE        = "title";          // タイトル
     public static final String STR_KEY_BODY         = "body";           // 内容
     public static final String STR_KEY_LIMIT        = "time_limit";     // 期限
-    public static final String STR_KEY_COMPLETE     = "complete";       // 完了日
+    public static final String STR_KEY_COMPLETE     = "complete";       // 完了日 清）sql now()
     public static final String STR_KEY_DELTE        = "deletion_date";  // 削除日
 
     /**

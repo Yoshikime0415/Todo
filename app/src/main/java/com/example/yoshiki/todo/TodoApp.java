@@ -55,6 +55,12 @@ import java.util.Date;
 public class TodoApp extends ListActivity {
 
     /**
+     * Todo実施期限表示の背景色定義
+     */
+    public static final int N_DATE_YELLOW = 7;
+    public static final int N_DATE_RED    = 2;
+
+    /**
      * メンバ変数定義
      */
     private TodoDbAdapter mDbHelper;
@@ -161,13 +167,13 @@ public class TodoApp extends ListActivity {
                 long nDiff = CDate.DiiffDate(df, strToday, strDate);
 
                 // 差分がN_DATE_REDより大きくN_DATE_YELLOW以下の場合は黄色
-                if ( (CState.N_DATE_RED < nDiff) && (nDiff <= CState.N_DATE_YELLOW) )
+                if ( (N_DATE_RED < nDiff) && (nDiff <= N_DATE_YELLOW) )
                 {
                     viewDate.setBackgroundColor(Color.parseColor("#ffa500"));
                 }
 
                 // 差分がN_DATE_RED以下の場合は赤色
-                else if ( nDiff <= CState.N_DATE_RED )
+                else if ( nDiff <= N_DATE_RED )
                 {
                     viewDate.setBackgroundColor(Color.parseColor("#FF4500"));
                 }
@@ -350,7 +356,7 @@ public class TodoApp extends ListActivity {
         // Activity起動
         startActivityForResult(
                 i,                           // インテント
-                CState.N_ACTIVITY_CREATE);   // Todoアイテム作成
+                TodoEdit.N_ACTIVITY_CREATE);   // Todoアイテム作成
     }
 
     /**
@@ -379,7 +385,7 @@ public class TodoApp extends ListActivity {
         // Activity起動
         startActivityForResult(
                 i,                         // インテント
-                CState.N_ACTIVITY_EDIT);   // TodoItem編集
+                TodoEdit.N_ACTIVITY_EDIT);   // TodoItem編集
     }
 
     /**
@@ -401,8 +407,8 @@ public class TodoApp extends ListActivity {
         {
             // Todoアイテム作成
             // Todoアイテム編集
-            case CState.N_ACTIVITY_CREATE:  // Throw
-            case CState.N_ACTIVITY_EDIT:
+            case TodoEdit.N_ACTIVITY_CREATE:  // Throw
+            case TodoEdit.N_ACTIVITY_EDIT:
                 // 最新のTodoアイテムリストを表示
                 fillData();
                 break;

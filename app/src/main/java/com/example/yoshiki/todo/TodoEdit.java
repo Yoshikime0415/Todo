@@ -30,6 +30,12 @@ import java.util.Date;
 public class TodoEdit extends Activity {
 
     /**
+     * TodoEditActivityコールタイミングの状態定義
+     */
+    public static final int N_ACTIVITY_CREATE  = 0;    // Todoアイテム作成
+    public static final int N_ACTIVITY_EDIT    = 1;    // Todoアイテム編集
+
+    /**
      * メンバ定義
      */
     private Long           mPrimaryKey; // TodoItemを特定するためのKey
@@ -112,7 +118,7 @@ public class TodoEdit extends Activity {
                 // Activity起動
                 startActivityForResult(
                         i,                                          // インテント
-                        CState.N_ACTIVITY_DATE);  // Todo実施期限設定
+                        TodoDate.N_ACTIVITY_DATE);  // Todo実施期限設定
             }
         });
 
@@ -328,7 +334,7 @@ public class TodoEdit extends Activity {
 
         switch (nRequestCode)
         {
-            case CState.N_ACTIVITY_DATE:
+            case TodoDate.N_ACTIVITY_DATE:
 
                 if (data != null) {
                     mLimit.setText(
