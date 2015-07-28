@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Todo</string>
+    <string name="menu_insert">新規追加</string>
+    <string name="menu_show_close">完了済みを表示</string>
+    <string name="menu_close">完了済みにする</string>
+    <string name="menu_delete">削除</string>
+    <string name="menu_save">保存</string>
+
+
+    <string name="no_notes">No Notes Yet</string>
+
+    <string name="title">タイトル</string>
+    <string name="body">内容</string>
+    <string name="confirm">Todoの登録</string>
+    <string name="close">Todoの完了</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="date">期限</string>
+    <string name="dateSet">設定</string>
+
+</resources>
+
