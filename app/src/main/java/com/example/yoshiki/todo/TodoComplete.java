@@ -49,16 +49,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * TodoAppのメインクラス.本クラスから各クラスへ処理を流していく.
+ * 完了済みアイテムを表示するクラス.本クラスから各クラスへ処理を流していく.
  * @author 清兼
  */
-public class TodoApp extends ListActivity {
-
+public class TodoComplete extends ListActivity {
     /**
-     * Todo実施期限表示の背景色定義
+     * TodoEditActivityコールタイミングの状態定義
      */
-    public static final int N_DATE_YELLOW = 7;
-    public static final int N_DATE_RED    = 2;
+    public static final int N_ACTIVITY_SHOW_COMPLETE_ITEM  = 0;    // Todoアイテム作成
 
     /**
      * メンバ変数定義
@@ -67,7 +65,7 @@ public class TodoApp extends ListActivity {
     private Cursor mTodoCursor;
 
     /**
-     * アプリケーションのメイン画面を表示し、Todoアイテムが保存されているDBを読み込み.
+     * 完了済みアイテム一覧を表示.
      *
      * @param savedInstanceState 保存されていたアプリケーション情報
      */
@@ -77,7 +75,7 @@ public class TodoApp extends ListActivity {
         super.onCreate(savedInstanceState);
 
         // Viewの表示
-        setContentView(R.layout.todo_list);
+        setContentView(R.layout.todo_complete_list);
 
         // DBアクセスクラスのインスタンスの生成
         mDbHelper = new TodoDbAdapter(this);
@@ -94,12 +92,12 @@ public class TodoApp extends ListActivity {
     }
 
     /**
-     * DBからTodoアイテムを取得し、アプリケーションメイン画面に配置する.
+     * DBから完了済みのTodoアイテムを取得し、画面に配置する.
      */
     private void fillData()
     {
-        // DBよりデータ取得(State=Open)
-        mTodoCursor = mDbHelper.fetchAllTodoItemsByStatus(TodoDbAdapter.STR_STATUS_OPEN);
+        // DBよりデータ取得(State=Complete)
+        mTodoCursor = mDbHelper.fetchAllTodoItemsByStatus(TodoDbAdapter.STR_STATUS_COMPLETE);
         mTodoCursor.moveToFirst();
 
         // カーソル上のデータ有無はSimpleCursorAdapterが判定してくれるため、チェック不要
@@ -108,10 +106,10 @@ public class TodoApp extends ListActivity {
         startManagingCursor(mTodoCursor);
 
         // アプリケーションメイン画面に表示させたいColumn名を指定
-        String[] strFrom = new String[]{TodoDbAdapter.STR_KEY_LIMIT,TodoDbAdapter.STR_KEY_TITLE};
+        String[] strFrom = new String[]{TodoDbAdapter.STR_KEY_TITLE};
 
         // 表示させるViewを指定
-        int[] nTo = new int[]{R.id.date,R.id.title};
+        int[] nTo = new int[]{R.id.title};
 
         // SimpleCursorAdapterインスタンス生成
         SimpleCursorAdapter TodoItems = new SimpleCursorAdapter(
@@ -122,88 +120,8 @@ public class TodoApp extends ListActivity {
                 nTo,                   // 表示先のView
                 0);
 
-        // コールバック関数登録
-        TodoItems.setViewBinder(new viewBinder());
-
         // アプリケーションメイン画面へ表示
         setListAdapter(TodoItems);
-    }
-
-    /**
-     * SimpleCursorAdapterのコールバック.
-     * @author 清兼
-     */
-    private  class viewBinder implements SimpleCursorAdapter.ViewBinder
-    {
-        /**
-         * リスト中にアイテムを表示.
-         *
-         * @param view 表示対象のView
-         * @param cursor DBのカーソル
-         * @param columnIndex ?
-         */
-        @Override
-        public boolean setViewValue(
-                View view,
-                Cursor cursor,
-                int columnIndex)
-        {
-            // ViewのIDを取得
-            TextView viewDate   = (TextView)view.findViewById(R.id.date);
-            TextView viewTitle  = (TextView)view.findViewById(R.id.title);
-
-            // viewDateに対する処理
-            if (viewDate != null)
-            {
-                // カーソルからTodo実施期限を取得
-                String strDate = cursor.getString(cursor.getColumnIndex(TodoDbAdapter.STR_KEY_LIMIT));
-
-                // 今日の日付を取得し、String型へ変換
-                SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-                Date today = new Date(System.currentTimeMillis());
-                String strToday = CDate.DateToString(df, today);
-
-                // 2つの日付の差分を取得
-                long nDiff = CDate.DiiffDate(df, strToday, strDate);
-
-                // 差分がN_DATE_REDより大きくN_DATE_YELLOW以下の場合は黄色
-                if ( (N_DATE_RED < nDiff) && (nDiff <= N_DATE_YELLOW) )
-                {
-                    viewDate.setBackgroundColor(Color.parseColor("#ffa500"));
-                }
-
-                // 差分がN_DATE_RED以下の場合は赤色
-                else if ( nDiff <= N_DATE_RED )
-                {
-                    viewDate.setBackgroundColor(Color.parseColor("#FF4500"));
-                }
-
-                // 上記以外は青
-                else
-                {
-                    viewDate.setBackgroundColor(Color.parseColor("#1E90FF"));
-                }
-
-                // 文字列を作成
-                // 取得した日付を分割
-                String[] strWork = strDate.split("/", 0);
-                String strDateFormat = strWork[0] + "<br><BIG><BIG>" + strWork[1] + "/" + strWork[2] + "</BIG></BIG>";
-                CharSequence source = Html.fromHtml(strDateFormat);
-
-                // 文字列を設定
-                viewDate.setText(source);
-            }
-
-            // viewTitleに対する処理
-            if (viewTitle != null) {
-                // カーソルからTodo実施期限を取得
-                String strTitle = cursor.getString(cursor.getColumnIndex(TodoDbAdapter.STR_KEY_TITLE));
-
-                // 文字列を設定
-                viewTitle.setText(strTitle);
-            }
-            return true;
-        }
     }
 
     /**
@@ -242,23 +160,15 @@ public class TodoApp extends ListActivity {
             switch (item.getItemId())
             {
                 case R.id.menu_multi_delete:
-                    long[] nDeleteId = getListView().getCheckedItemIds();
-                    mDbHelper.deleteTodoItem(nDeleteId);
-                    fillData();
+                    //long[] nDeleteId = getListView().getCheckedItemIds();
+                    //mDbHelper.deleteTodoItem(nDeleteId);
+                    ///fillData();
                     // ダイアログを表示する
                     break;
 
                 case R.id.menu_multi_complete:
-                    long[] nDeleteIdList = getListView().getCheckedItemIds();
-
-                    // ステータスを設定
-                    int nArraySize = nDeleteIdList.length;
-                    String[] strStatus = new String[nArraySize];
-                    for (int i = 0; i < nArraySize; i++){
-                        strStatus[i] = TodoDbAdapter.STR_KEY_COMPLETE;
-                    }
-                    mDbHelper.updateTodoItemStatus(nDeleteIdList, strStatus);
-                    fillData();
+//                    long[] nDeleteId = getListView().getCheckedItemIds();
+                    //                  mDbHelper.updateTodoItem()
                     break;
 
                 default:
@@ -342,9 +252,7 @@ public class TodoApp extends ListActivity {
 
             // 完了済みのTodoアイテムを表示
             case R.id.menu_show_complete:
-                shoWCompeteItem();
                 break;
-
 
             default:
                 // Nothing to do
@@ -352,20 +260,6 @@ public class TodoApp extends ListActivity {
         }
 
         return true;
-    }
-
-    /**
-     * 完了済みのTodoアイテムを表示.
-     */
-    private void shoWCompeteItem()
-    {
-        // インテント作成
-        Intent i = new Intent(this, TodoComplete.class);
-
-        // Activity起動
-        startActivityForResult(
-                i,                                       // インテント
-                TodoComplete.N_ACTIVITY_SHOW_COMPLETE_ITEM); // 完了済みのTodoアイテムを表示
     }
 
     /**

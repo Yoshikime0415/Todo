@@ -3,7 +3,7 @@
 
     <!-- 完了済みにする -->
     <item
-        android:id="@+id/menu_multi_close"
+        android:id="@+id/menu_multi_complete"
         android:title="@string/menu_close"
         android:icon="@drawable/ic_menu_mark"
         android:showAsAction="ifRoom|withText"/>

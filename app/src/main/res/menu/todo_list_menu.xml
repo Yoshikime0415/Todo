@@ -10,7 +10,7 @@
 
     <!-- 完了済みを表示 -->
     <item
-        android:id="@+id/menu_show_close"
+        android:id="@+id/menu_show_complete"
         android:title="@string/menu_show_close"
         android:showAsAction="never"/>
 </menu>
